@@ -44,7 +44,7 @@
 #define KEY_RELEASE     0
 
 /* 2 Touch key array */
-#define 	TOUCH_KEY_NULL		0x00
+#define TOUCH_KEY_NULL		0x00
 #define	TOUCH_2KEY_MENU	0x01
 #define	TOUCH_2KEY_BACK		0x02
 
@@ -878,12 +878,13 @@ u8 mxt_valid_interrupt(void);
 void    mxt_hw_reset(void);
 
 #ifdef KEY_LED_CONTROL
+
 #define MENU_LED_2KEY		0xFE
-#define BACK_LED_2KEY			0xFD
+#define BACK_LED_2KEY		0xFD
 
 #define MENU_LED_4KEY		0xFE
 #define HOME_LED_4KEY		0xFD
-#define BACK_LED_4KEY			0xFB
+#define BACK_LED_4KEY		0xFB
 #define SEARCH_LED_4KEY		0xF7
 
 static void key_led_on(struct mxt_data *mxt, u32 val);

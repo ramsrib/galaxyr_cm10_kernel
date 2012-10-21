@@ -19,6 +19,10 @@
 #include "wm8994_samsung.h"
 #include <linux/mfd/max8907c.h>
 
+#ifdef CONFIG_SND_VOODOO
+#include "wm8994_voodoo.h"
+#endif
+
 /*
  * Debug Feature
  */
@@ -2459,12 +2463,17 @@ void wm8994_record_main_mic(struct snd_soc_codec *codec)
 
 	if (wm8994->input_source == DEFAULT)
 		audio_ctrl_mic_bias_gpio(wm8994->pdata, MAIN_MIC_ON);
+
+#ifdef CONFIG_SND_VOODOO_RECORD_PRESETS
+	voodoo_hook_record_main_mic();
+#endif
+
 }
 
 #if defined(CONFIG_MACH_N1_CHN)
 void wm8994_record_Voice_all(struct snd_soc_codec *codec)
 {
-	struct wm8994_priv *wm8994 = codec->drvdata;
+	struct wm8994_priv *wm8994 = snd_soc_codec_get_drvdata(codec);
 
 	u16 val;
 
@@ -2476,7 +2485,7 @@ void wm8994_record_Voice_all(struct snd_soc_codec *codec)
 }
 void wm8994_record_Voice_rx(struct snd_soc_codec *codec)
 {
-	struct wm8994_priv *wm8994 = codec->drvdata;
+	struct wm8994_priv *wm8994 = snd_soc_codec_get_drvdata(codec);
 
 	u16 val;
 

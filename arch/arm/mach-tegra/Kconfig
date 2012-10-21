@@ -148,6 +148,13 @@ config MACH_N1
        help
          Support for Samsung N1 platform
 
+config MACH_N1_CHN
+       bool "N1 CHN board"
+       default n
+       depends on MACH_N1
+       help
+         Support for Samsung N1 platform (China)
+
 config MACH_BOSE_ATT
        bool "BOSE board"
        default n

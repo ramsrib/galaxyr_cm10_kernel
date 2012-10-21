@@ -56,7 +56,10 @@ static int initialized=0;
 
 static struct spi_device *n1_disp1_spi;
 static struct regulator *reg_lcd_1v8, *reg_lcd_3v0;
+
+#if 0
 static struct early_suspend n1_panel_early_suspend;
+#endif
 
 static void n1_panel_config_pins(void);
 static void n1_panel_reconfig_pins(void);
@@ -146,12 +149,12 @@ static int n1_panel_enable(void)
 	gpio_set_value(n1_lvds_reset, 1);
 	//gpio_set_value(GPIO_LCD_LDO_LED_EN, 1);
 
-    msleep(10);//10ms
-    //Pushing DC data out 10 msec after from LCD reset.
+	msleep(10);//10ms
+	//Pushing DC data out 10 msec after from LCD reset.
 	if (initialized)
 		tegra_fb_dc_data_out(registered_fb[0]);
 
-    msleep(40);//40ms
+	msleep(40);//40ms
 	msleep(50);//50ms
 	msleep(10);//50ms
 
@@ -209,46 +212,50 @@ SYMBOL_EXPORT(n1_panel_disable);
 
 static void n1_panel_config_pins(void)
 {
-    tegra_gpio_enable(TEGRA_GPIO_PN4);
-    gpio_request(TEGRA_GPIO_PN4, "SFIO_LCD_NCS");
-    gpio_direction_output(TEGRA_GPIO_PN4, 0);
-    tegra_gpio_enable(TEGRA_GPIO_PZ4);
-    gpio_request(TEGRA_GPIO_PZ4, "SFIO_LCD_SCLK");
-    gpio_direction_output(TEGRA_GPIO_PZ4, 0);
+	tegra_gpio_enable(TEGRA_GPIO_PN4);
+	gpio_request(TEGRA_GPIO_PN4, "SFIO_LCD_NCS");
+	gpio_direction_output(TEGRA_GPIO_PN4, 0);
+	tegra_gpio_enable(TEGRA_GPIO_PZ4);
+	gpio_request(TEGRA_GPIO_PZ4, "SFIO_LCD_SCLK");
+	gpio_direction_output(TEGRA_GPIO_PZ4, 0);
 }
 
 static void n1_panel_reconfig_pins(void)
 {
-    /* LCD_nCS */
-    tegra_gpio_disable(TEGRA_GPIO_PN4);
-    /* LCD_SCLK */
-    tegra_gpio_disable(TEGRA_GPIO_PZ4);
+	/* LCD_nCS */
+	tegra_gpio_disable(TEGRA_GPIO_PN4);
+	/* LCD_SCLK */
+	tegra_gpio_disable(TEGRA_GPIO_PZ4);
 	gpio_free(TEGRA_GPIO_PN4);
 	gpio_free(TEGRA_GPIO_PZ4);
 }
 
+
+#ifndef CONFIG_HAS_EARLYSUSPEND
 static int panel_n1_spi_suspend(struct spi_device *spi, pm_message_t message)
 {
 	printk(KERN_INFO "\n ************ %s : %d \n", __func__, __LINE__);
 	n1_panel_disable();
-    n1_panel_config_pins();
-    return 0;
-}
-
-static int panel_n1_spi_shutdown(struct spi_device *spi, pm_message_t message)
-{
-	printk(KERN_INFO "\n ************ %s : %d \n", __func__, __LINE__);
-	n1_panel_disable();
+	n1_panel_config_pins();
 	return 0;
 }
 
 static int panel_n1_spi_resume(struct spi_device *spi)
 {
 	printk(KERN_INFO "\n ************ %s : %d \n", __func__, __LINE__);
-    n1_panel_reconfig_pins();
-    n1_panel_enable();
+	n1_panel_reconfig_pins();
+	n1_panel_enable();
 	return 0;
 }
+#endif
+
+
+static void panel_n1_spi_shutdown(struct spi_device *spi)
+{
+	printk(KERN_INFO "\n ************ %s : %d \n", __func__, __LINE__);
+	n1_panel_disable();
+}
+
 
 #if LCD_ONOFF_TEST
 void lcd_power_on(void)
