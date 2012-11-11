@@ -497,7 +497,7 @@ static struct multi_touch_info mtouch_info[MXT_MAX_NUM_TOUCHES];
 static bool palm_check_timer_flag = false;
 static bool palm_release_flag = true;
 
-#define TOUCH_LOCKUP_PATTERN_RELEASE
+//#define TOUCH_LOCKUP_PATTERN_RELEASE
 
 #ifdef TOUCH_LOCKUP_PATTERN_RELEASE
 
@@ -5552,6 +5552,7 @@ param_check_ok:
 	if (device_create_file(led_dev, &dev_attr_brightness) < 0) {
 		pr_err("[TSP] Failed to create device file(%s)!\n", dev_attr_brightness.attr.name);
 	}
+	setup_timer(&key_led_timer, key_led_timer_callback, (unsigned long) mxt);
 
 #ifdef CONFIG_TOUCHKEY_BLN
         error = misc_register( &bln_device );
@@ -5674,14 +5675,11 @@ static int __devexit mxt_remove(struct i2c_client *client)
 	device_destroy(leds_class, 0);
 	class_destroy(leds_class);
 
+	del_timer(&key_led_timer);
 #ifdef CONFIG_TOUCHKEY_BLN
         misc_deregister(&bln_device);
 #endif /* CONFIG_TOUCHKEY_BLN */
 #endif /* KEY_LED_CONTROL */
-
-#ifdef KEY_LED_CONTROL
-	del_timer(&key_led_timer);
-#endif
 
 	/* Release IRQ so no queue will be scheduled */
 	if (mxt->irq)
